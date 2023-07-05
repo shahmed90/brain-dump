@@ -1,0 +1,39 @@
+version: '3'
+
+tasks:
+
+  init:
+    desc: Initialize after cloning
+    cmds:
+      - git submodule update --init --recursive
+      - git config diff.ignoreSubmodules dirty
+      - pre-commit install
+      - task: init_theme
+
+  init_theme:
+    internal: true
+    dir: themes/blowfish
+    cmds: ["npm ci"]
+
+  serve:
+    desc: Run static server locally
+    cmds:
+      - hugo serve -D --baseURL "http://localhost:1313/brain-dump"
+
+  add-dump:
+    desc: Add a new dump (rel. path as argument)
+    cmds:
+      - '[ "{{ .CLI_ARGS }}" != "" ] || (echo "needs input" && exit 1)'
+      - hugo new dumps/{{ trim (trimSuffix "/" .CLI_ARGS) }}/index.md
+
+  repo:
+    desc: Get repo
+    silent: true
+    cmds:
+      - echo "https://github.com/shahmed90/brain-dump"
+
+  public:
+    desc: Get public website URL
+    silent: true
+    cmds:
+      - echo "https://shahmed90.github.io/brain-dump"
